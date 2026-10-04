@@ -1,0 +1,8 @@
+{
+  "name": "Remix نسمة الحياة",
+  "description": "تطبيق عربي للتوعية بالصحة النفسية والمساعدة الذاتية والاستكشاف الآمن والدعم والتوجيه",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

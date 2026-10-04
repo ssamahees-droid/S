@@ -1,0 +1,19 @@
+{
+  "appName": "نسمة الحياة",
+  "nameEn": "Nesmat Al Hayat",
+  "version": "1.0-MVP",
+  "routes": [
+    { "path": "/", "name": "welcome", "title": "البداية" },
+    { "path": "/onboarding", "name": "onboarding", "title": "التعارف" },
+    { "path": "/home", "name": "home", "title": "الرئيسية" },
+    { "path": "/discover", "name": "discover", "title": "اكتشف" },
+    { "path": "/light", "name": "light_activities", "title": "خفة ولعب (الألعاب والأنشطة)" },
+    { "path": "/journey", "name": "journey", "title": "رحلتي" },
+    { "path": "/account", "name": "account", "title": "حسابي" },
+    { "path": "/assessment", "name": "assessment", "title": "قيّم حالتك" },
+    { "path": "/breathe", "name": "breathe", "title": "خد نفس" },
+    { "path": "/support", "name": "support", "title": "محتاج أتكلم" },
+    { "path": "/chat", "name": "gemini_chat", "title": "رفيق نسمة الحياة الذكي" },
+    { "path": "/studio", "name": "image_studio", "title": "استوديو السكينة البصرية" }
+  ]
+}
