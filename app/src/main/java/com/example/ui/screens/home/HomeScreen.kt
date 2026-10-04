@@ -36,9 +36,11 @@ import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.SelfImprovement
 import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material.icons.filled.SupportAgent
+import com.example.components.DailyHabitsCard
 import com.example.components.DailyWisdomCapsule
 import com.example.components.LivingTranquilityTree
 import com.example.components.NesmatTodayCard
+import com.example.data.model.WellnessHabit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -106,6 +108,13 @@ fun HomeScreen(
   onContentClick: (Long) -> Unit,
   onToggleFavorite: (Long, Boolean) -> Unit,
   onWisdomCopied: () -> Unit = {},
+  todayHabits: List<WellnessHabit> = emptyList(),
+  onToggleHabit: (Long, Boolean) -> Unit = { _, _ -> },
+  onAddCustomHabit: (String, String) -> Unit = { _, _ -> },
+  onDeleteHabit: (Long) -> Unit = {},
+  onNavigateToGrounding: () -> Unit = {},
+  onNavigateToGratitude: () -> Unit = {},
+  onNavigateToContentCreator: () -> Unit = {},
   modifier: Modifier = Modifier
 ) {
   val moods = remember {
@@ -305,6 +314,135 @@ fun HomeScreen(
       }
 
       Spacer(modifier = Modifier.height(20.dp))
+    }
+
+    // بطاقة عادات التعافي والسكينة اليومية (التحديث الجديد)
+    item {
+      DailyHabitsCard(
+        habits = todayHabits,
+        onToggleHabit = onToggleHabit,
+        onAddCustomHabit = onAddCustomHabit,
+        onDeleteHabit = onDeleteHabit,
+        modifier = Modifier.padding(bottom = 20.dp)
+      )
+    }
+
+    // قسم التحديثات الجديدة التفاعلية: التأريض + الامتنان + نشر المحتوى
+    item {
+      Card(
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = SoftMint.copy(alpha = 0.35f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(bottom = 20.dp)
+      ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+              Text(text = "✨", fontSize = 20.sp)
+              Spacer(modifier = Modifier.width(8.dp))
+              Text(
+                text = "التحديثات الجديدة المضافة اليوم",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                color = DarkGreen
+              )
+            }
+            Box(
+              modifier = Modifier
+                .clip(RoundedCornerShape(8.dp))
+                .background(DarkGreen)
+                .padding(horizontal = 8.dp, vertical = 2.dp)
+            ) {
+              Text(text = "جديد", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+            }
+          }
+
+          Spacer(modifier = Modifier.height(12.dp))
+
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+          ) {
+            // Button 1: Grounding
+            Box(
+              modifier = Modifier
+                .weight(1f)
+                .clip(RoundedCornerShape(14.dp))
+                .background(Color.White)
+                .clickable { onNavigateToGrounding() }
+                .padding(10.dp)
+                .testTag("shortcut_grounding"),
+              contentAlignment = Alignment.Center
+            ) {
+              Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = "👁️", fontSize = 22.sp)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                  text = "تأريض 5-4-3-2-1",
+                  fontSize = 11.sp,
+                  fontWeight = FontWeight.Bold,
+                  color = DarkGreen,
+                  textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+              }
+            }
+
+            // Button 2: Gratitude Journal
+            Box(
+              modifier = Modifier
+                .weight(1f)
+                .clip(RoundedCornerShape(14.dp))
+                .background(Color.White)
+                .clickable { onNavigateToGratitude() }
+                .padding(10.dp)
+                .testTag("shortcut_gratitude"),
+              contentAlignment = Alignment.Center
+            ) {
+              Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = "✨", fontSize = 22.sp)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                  text = "مفكرة الامتنان",
+                  fontSize = 11.sp,
+                  fontWeight = FontWeight.Bold,
+                  color = DarkGreen,
+                  textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+              }
+            }
+
+            // Button 3: Content Creator
+            Box(
+              modifier = Modifier
+                .weight(1f)
+                .clip(RoundedCornerShape(14.dp))
+                .background(Color.White)
+                .clickable { onNavigateToContentCreator() }
+                .padding(10.dp)
+                .testTag("shortcut_content_creator"),
+              contentAlignment = Alignment.Center
+            ) {
+              Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = "✍️", fontSize = 22.sp)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                  text = "نشر مقال جديد",
+                  fontSize = 11.sp,
+                  fontWeight = FontWeight.Bold,
+                  color = DarkGreen,
+                  textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+              }
+            }
+          }
+        }
+      }
     }
 
     // المرحلة الجديدة: بطاقة رئيسية واضحة "🌿 أنا دلوقتي..."

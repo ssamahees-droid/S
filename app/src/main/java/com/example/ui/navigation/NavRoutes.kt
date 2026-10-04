@@ -31,6 +31,9 @@ sealed class Screen(val route: String) {
     const val BASE_ROUTE = "nesmat_article_detail"
     fun createRoute(articleId: Int) = "$BASE_ROUTE/$articleId"
   }
+  object Grounding : Screen("grounding")
+  object GratitudeJournal : Screen("gratitude_journal")
+  object ContentCreator : Screen("content_creator")
 
   companion object {
     fun fromRoute(route: String?): Screen = when {
@@ -56,6 +59,9 @@ sealed class Screen(val route: String) {
       route == GwayaHekaya.route -> GwayaHekaya
       route == NesmatLibrary.route -> NesmatLibrary
       route == RightNow.route -> RightNow
+      route == Grounding.route -> Grounding
+      route == GratitudeJournal.route -> GratitudeJournal
+      route == ContentCreator.route -> ContentCreator
       route?.startsWith("right_now/") == true -> RightNowStateDetail
       route?.startsWith(NesmatArticleDetail.BASE_ROUTE) == true -> NesmatArticleDetail
       else -> Home

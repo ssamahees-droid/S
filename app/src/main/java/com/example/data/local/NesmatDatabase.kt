@@ -11,6 +11,7 @@ import com.example.data.model.DailyCheckin
 import com.example.data.model.PersonalNote
 import com.example.data.model.SupportRequest
 import com.example.data.model.UserPreference
+import com.example.data.model.WellnessHabit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,9 +23,10 @@ import kotlinx.coroutines.launch
     PersonalNote::class,
     AssessmentResult::class,
     SupportRequest::class,
-    UserPreference::class
+    UserPreference::class,
+    WellnessHabit::class
   ],
-  version = 2,
+  version = 3,
   exportSchema = false
 )
 abstract class NesmatDatabase : RoomDatabase() {
@@ -34,6 +36,7 @@ abstract class NesmatDatabase : RoomDatabase() {
   abstract fun assessmentDao(): AssessmentDao
   abstract fun supportDao(): SupportDao
   abstract fun userPrefDao(): UserPrefDao
+  abstract fun habitDao(): HabitDao
 
   companion object {
     @Volatile

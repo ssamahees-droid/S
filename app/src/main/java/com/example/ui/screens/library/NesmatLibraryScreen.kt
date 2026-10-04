@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
@@ -69,6 +70,7 @@ fun NesmatLibraryScreen(
   onOpenArticle: (Int) -> Unit,
   onSaveToJourney: (String, String) -> Unit,
   onOpenWorkshopsAndAudio: () -> Unit = {},
+  onNavigateToContentCreator: () -> Unit = {},
   onBack: () -> Unit,
   modifier: Modifier = Modifier
 ) {
@@ -103,6 +105,18 @@ fun NesmatLibraryScreen(
           Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = "الرجوع",
+            tint = DarkGreen
+          )
+        }
+      },
+      actions = {
+        IconButton(
+          onClick = onNavigateToContentCreator,
+          modifier = Modifier.testTag("library_add_article_btn")
+        ) {
+          Icon(
+            imageVector = Icons.Default.Add,
+            contentDescription = "إضافة مقال جديد",
             tint = DarkGreen
           )
         }

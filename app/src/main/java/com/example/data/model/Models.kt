@@ -35,7 +35,18 @@ data class PersonalNote(
   @PrimaryKey(autoGenerate = true) val id: Long = 0,
   val title: String,
   val content: String,
+  val tag: String = "امتنان", // امتنان, عائلة, عمل, صحة, أمل, عام
+  val moodEmoji: String = "🌸",
   val timestamp: Long = System.currentTimeMillis()
+)
+
+@Entity(tableName = "wellness_habits")
+data class WellnessHabit(
+  @PrimaryKey(autoGenerate = true) val id: Long = 0,
+  val title: String,
+  val iconEmoji: String = "🌱",
+  val isCompleted: Boolean = false,
+  val date: String // YYYY-MM-DD
 )
 
 @Entity(tableName = "assessment_results")

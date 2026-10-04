@@ -12,6 +12,7 @@ import com.example.data.model.DailyCheckin
 import com.example.data.model.PersonalNote
 import com.example.data.model.SupportRequest
 import com.example.data.model.UserPreference
+import com.example.data.model.WellnessHabit
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -131,5 +132,32 @@ interface UserPrefDao {
   suspend fun savePreferences(pref: UserPreference)
 
   @Query("DELETE FROM user_preferences")
+  suspend fun clearAll()
+}
+
+@Dao
+interface HabitDao {
+  @Query("SELECT * FROM wellness_habits WHERE date = :date ORDER BY id ASC")
+  fun getHabitsForDate(date: String): Flow<List<WellnessHabit>>
+
+  @Query("SELECT COUNT(*) FROM wellness_habits WHERE date = :date")
+  suspend fun getHabitsCountForDate(date: String): Int
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insertHabit(habit: WellnessHabit): Long
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insertAll(habits: List<WellnessHabit>)
+
+  @Update
+  suspend fun updateHabit(habit: WellnessHabit)
+
+  @Query("UPDATE wellness_habits SET isCompleted = :completed WHERE id = :id")
+  suspend fun toggleHabit(id: Long, completed: Boolean)
+
+  @Query("DELETE FROM wellness_habits WHERE id = :id")
+  suspend fun deleteHabit(id: Long)
+
+  @Query("DELETE FROM wellness_habits")
   suspend fun clearAll()
 }

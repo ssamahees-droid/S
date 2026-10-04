@@ -7,6 +7,7 @@ import com.example.data.model.DailyCheckin
 import com.example.data.model.PersonalNote
 import com.example.data.model.SupportRequest
 import com.example.data.model.UserPreference
+import com.example.data.model.WellnessHabit
 import kotlinx.coroutines.flow.Flow
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -20,6 +21,7 @@ class NesmatRepository(private val database: NesmatDatabase) {
   private val assessmentDao = database.assessmentDao()
   private val supportDao = database.supportDao()
   private val userPrefDao = database.userPrefDao()
+  private val habitDao = database.habitDao()
 
   // Content
   val publishedContent: Flow<List<ContentItem>> = contentDao.getPublishedContent()
@@ -73,11 +75,18 @@ class NesmatRepository(private val database: NesmatDatabase) {
   // Personal Notes
   val allNotes: Flow<List<PersonalNote>> = noteDao.getAllNotes()
 
-  suspend fun addNote(title: String, content: String) {
+  suspend fun addNote(
+    title: String,
+    content: String,
+    tag: String = "امتنان",
+    moodEmoji: String = "🌸"
+  ) {
     noteDao.insertNote(
       PersonalNote(
         title = title.ifBlank { "خاطرة جديدة" },
         content = content,
+        tag = tag,
+        moodEmoji = moodEmoji,
         timestamp = System.currentTimeMillis()
       )
     )
@@ -156,6 +165,47 @@ class NesmatRepository(private val database: NesmatDatabase) {
     userPrefDao.savePreferences(pref)
   }
 
+  // Wellness Habits
+  fun getTodayHabits(): Flow<List<WellnessHabit>> {
+    val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+    return habitDao.getHabitsForDate(today)
+  }
+
+  suspend fun ensureDefaultHabitsForToday() {
+    val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+    val count = habitDao.getHabitsCountForDate(today)
+    if (count == 0) {
+      val defaultHabits = listOf(
+        WellnessHabit(title = "٥ دقائق تنفس هادئ وعميق", iconEmoji = "🌬️", date = today),
+        WellnessHabit(title = "شرب كوب ماء بوعي وتأمل", iconEmoji = "💧", date = today),
+        WellnessHabit(title = "تدوين سطر امتنان واحد", iconEmoji = "✨", date = today),
+        WellnessHabit(title = "مشي خفيف أو حركة ١٠ دقائق", iconEmoji = "🚶", date = today),
+        WellnessHabit(title = "لحظة صمت وتصفية الذهن", iconEmoji = "🧘", date = today)
+      )
+      habitDao.insertAll(defaultHabits)
+    }
+  }
+
+  suspend fun toggleHabit(id: Long, completed: Boolean) {
+    habitDao.toggleHabit(id, completed)
+  }
+
+  suspend fun addCustomHabit(title: String, iconEmoji: String = "🌱") {
+    val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+    habitDao.insertHabit(
+      WellnessHabit(
+        title = title,
+        iconEmoji = iconEmoji,
+        isCompleted = false,
+        date = today
+      )
+    )
+  }
+
+  suspend fun deleteHabit(id: Long) {
+    habitDao.deleteHabit(id)
+  }
+
   // Privacy & Data Erasure (Egyptian Law 151 / Play Health Guidelines)
   suspend fun eraseAllUserData() {
     checkinDao.clearAll()
@@ -163,5 +213,6 @@ class NesmatRepository(private val database: NesmatDatabase) {
     assessmentDao.clearAll()
     supportDao.clearAll()
     userPrefDao.clearAll()
+    habitDao.clearAll()
   }
 }

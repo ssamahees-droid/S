@@ -29,4 +29,19 @@ class NesmatAppLogicTest {
     assertEquals(10, count)
     assertTrue("Word count should be within 500 words", count <= 500)
   }
+
+  @Test
+  fun testWellnessHabitsProgressCalculation() {
+    val totalHabits = 5
+    val completedHabits = 3
+    val progress = completedHabits.toFloat() / totalHabits
+    assertEquals(0.6f, progress, 0.001f)
+  }
+
+  @Test
+  fun testGroundingExerciseStepsCount() {
+    val groundingCounts = listOf(5, 4, 3, 2, 1)
+    assertEquals(5, groundingCounts.size)
+    assertEquals(15, groundingCounts.sum())
+  }
 }

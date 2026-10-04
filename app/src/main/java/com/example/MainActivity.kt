@@ -62,11 +62,14 @@ import com.example.ui.screens.ai.CalmImageStudioScreen
 import com.example.ui.screens.ai.GeminiChatScreen
 import com.example.ui.screens.assessment.AssessmentScreen
 import com.example.ui.screens.breathe.BreatheScreen
+import com.example.ui.screens.breathe.GroundingExerciseScreen
 import com.example.ui.screens.explore.ContentDetailScreen
 import com.example.ui.screens.explore.ExploreScreen
 import com.example.ui.screens.gwaya.GwayaHekayaScreen
 import com.example.ui.screens.home.HomeScreen
+import com.example.ui.screens.journal.GratitudeJournalScreen
 import com.example.ui.screens.journey.JourneyScreen
+import com.example.ui.screens.library.ContentCreatorScreen
 import com.example.ui.screens.library.NesmatArticleDetailScreen
 import com.example.ui.screens.library.NesmatLibraryScreen
 import com.example.ui.screens.now.RightNowScreen
@@ -127,6 +130,7 @@ fun MainApp(viewModel: NesmatViewModel) {
   val generatedCalmImage by viewModel.generatedCalmImage.collectAsState()
   val isImageGenerating by viewModel.isImageGenerating.collectAsState()
   val mindfulMomentsCount by viewModel.mindfulMomentsCount.collectAsState()
+  val todayHabits by viewModel.todayHabits.collectAsState()
 
   val snackbarHostState = remember { SnackbarHostState() }
   val scope = rememberCoroutineScope()
@@ -240,7 +244,14 @@ fun MainApp(viewModel: NesmatViewModel) {
             scope.launch {
               snackbarHostState.showSnackbar("تم نسخ الحكمة إلى الحافظة ✨")
             }
-          }
+          },
+          todayHabits = todayHabits,
+          onToggleHabit = { id, comp -> viewModel.toggleHabit(id, comp) },
+          onAddCustomHabit = { t, em -> viewModel.addCustomHabit(t, em) },
+          onDeleteHabit = { id -> viewModel.deleteHabit(id) },
+          onNavigateToGrounding = { navigateToScreen(Screen.Grounding) },
+          onNavigateToGratitude = { navigateToScreen(Screen.GratitudeJournal) },
+          onNavigateToContentCreator = { navigateToScreen(Screen.ContentCreator) }
         )
       }
 
@@ -276,6 +287,7 @@ fun MainApp(viewModel: NesmatViewModel) {
             }
           },
           onOpenWorkshopsAndAudio = { navigateToScreen(Screen.Explore) },
+          onNavigateToContentCreator = { navigateToScreen(Screen.ContentCreator) },
           onBack = {
             if (!navController.popBackStack()) {
               navigateToTopLevel(Screen.Home)
@@ -618,6 +630,59 @@ fun MainApp(viewModel: NesmatViewModel) {
           onBack = {
             if (!navController.popBackStack()) {
               navigateToTopLevel(Screen.Profile)
+            }
+          }
+        )
+      }
+
+      composable(Screen.Grounding.route) {
+        GroundingExerciseScreen(
+          onBack = {
+            if (!navController.popBackStack()) {
+              navigateToTopLevel(Screen.Home)
+            }
+          },
+          onCompleteExercise = {
+            viewModel.recordDailyCheckin("كويس", "أتممت تمرين التأريض الحسي 5-4-3-2-1 🌱")
+            scope.launch {
+              snackbarHostState.showSnackbar("أحسنت! تمت إضافة نقطة يقظة ذهنية لشجرتك 🌿")
+            }
+          }
+        )
+      }
+
+      composable(Screen.GratitudeJournal.route) {
+        val allNotes by viewModel.allNotes.collectAsState()
+        GratitudeJournalScreen(
+          notes = allNotes,
+          onAddNote = { title, content, tag, moodEmoji ->
+            viewModel.addGratitudeNote(title, content, tag, moodEmoji) {
+              scope.launch {
+                snackbarHostState.showSnackbar("تم حفظ الخاطرة في مفكرتك ✨")
+              }
+            }
+          },
+          onDeleteNote = { id -> viewModel.deleteNote(id) },
+          onBack = {
+            if (!navController.popBackStack()) {
+              navigateToTopLevel(Screen.Home)
+            }
+          }
+        )
+      }
+
+      composable(Screen.ContentCreator.route) {
+        ContentCreatorScreen(
+          onPublish = { title, category, description, body, duration, author ->
+            viewModel.publishNewArticle(title, category, description, body, duration, author) {
+              scope.launch {
+                snackbarHostState.showSnackbar("تم نشر المحتوى بنجاح في المكتبة 🎉")
+              }
+            }
+          },
+          onBack = {
+            if (!navController.popBackStack()) {
+              navigateToTopLevel(Screen.NesmatLibrary)
             }
           }
         )

@@ -13,6 +13,7 @@ import com.example.data.model.DailyCheckin
 import com.example.data.model.PersonalNote
 import com.example.data.model.SupportRequest
 import com.example.data.model.UserPreference
+import com.example.data.model.WellnessHabit
 import com.example.data.repository.NesmatRepository
 import com.example.util.AmbientAudioPlayer
 import com.example.util.AudioRecorderHelper
@@ -41,12 +42,26 @@ class NesmatViewModel(application: Application) : AndroidViewModel(application) 
   val geminiService = GeminiApiService()
   val audioRecorder = AudioRecorderHelper(application)
 
+  val todayHabits: StateFlow<List<WellnessHabit>> = repository.getTodayHabits().stateIn(
+    scope = viewModelScope,
+    started = SharingStarted.WhileSubscribed(5000),
+    initialValue = emptyList()
+  )
+
+  init {
+    viewModelScope.launch {
+      repository.ensureDefaultHabitsForToday()
+    }
+  }
+
   val mindfulMomentsCount: StateFlow<Int> = combine(
     repository.allCheckins,
     repository.allNotes,
-    repository.allAssessments
-  ) { checkins: List<DailyCheckin>, notes: List<PersonalNote>, assessments: List<AssessmentResult> ->
-    (checkins.size + notes.size + assessments.size).coerceAtLeast(1)
+    repository.allAssessments,
+    todayHabits
+  ) { checkins: List<DailyCheckin>, notes: List<PersonalNote>, assessments: List<AssessmentResult>, habits: List<WellnessHabit> ->
+    val completedHabits = habits.count { it.isCompleted }
+    (checkins.size + notes.size + assessments.size + completedHabits).coerceAtLeast(1)
   }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 1)
 
   // Gemini AI Chat State (gemini-3.5-flash with Search Grounding)
@@ -230,6 +245,68 @@ class NesmatViewModel(application: Application) : AndroidViewModel(application) 
   fun addNote(title: String, content: String) {
     viewModelScope.launch {
       repository.addNote(title, content)
+    }
+  }
+
+  fun addGratitudeNote(
+    title: String,
+    content: String,
+    tag: String = "امتنان",
+    moodEmoji: String = "🌸",
+    onComplete: (() -> Unit)? = null
+  ) {
+    viewModelScope.launch {
+      repository.addNote(title, content, tag, moodEmoji)
+      onComplete?.invoke()
+    }
+  }
+
+  fun toggleHabit(id: Long, completed: Boolean) {
+    viewModelScope.launch {
+      repository.toggleHabit(id, completed)
+    }
+  }
+
+  fun addCustomHabit(title: String, iconEmoji: String = "🌱") {
+    viewModelScope.launch {
+      repository.addCustomHabit(title, iconEmoji)
+    }
+  }
+
+  fun deleteHabit(id: Long) {
+    viewModelScope.launch {
+      repository.deleteHabit(id)
+    }
+  }
+
+  fun publishNewArticle(
+    title: String,
+    category: String,
+    description: String,
+    body: String,
+    duration: String,
+    author: String = "فريق نسمة الحياة",
+    reviewer: String = "أخصائي نفسي معتمد",
+    contentType: String = "article",
+    onComplete: () -> Unit
+  ) {
+    viewModelScope.launch {
+      val newItem = ContentItem(
+        title = title,
+        description = description,
+        body = body,
+        category = category,
+        contentType = contentType,
+        duration = duration,
+        author = author,
+        reviewer = reviewer,
+        reviewStatus = "Published",
+        publishedAt = System.currentTimeMillis(),
+        isFavorite = false,
+        isSuggested = true
+      )
+      repository.saveContentItem(newItem)
+      onComplete()
     }
   }
 
