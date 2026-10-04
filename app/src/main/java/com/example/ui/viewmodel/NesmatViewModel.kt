@@ -118,7 +118,12 @@ class NesmatViewModel(application: Application) : AndroidViewModel(application) 
     initialValue = emptyList()
   )
 
-  val suggestedContent: StateFlow<List<ContentItem>> = repository.suggestedContent.stateIn(
+  val suggestedContent: StateFlow<List<ContentItem>> = combine(
+    repository.suggestedContent,
+    publishedContent
+  ) { suggested, published ->
+    if (suggested.isNotEmpty()) suggested else published.take(6)
+  }.stateIn(
     scope = viewModelScope,
     started = SharingStarted.WhileSubscribed(5000),
     initialValue = emptyList()
@@ -137,7 +142,12 @@ class NesmatViewModel(application: Application) : AndroidViewModel(application) 
     selectedCategory
   ) { items, query, category ->
     items.filter { item ->
-      val matchesCategory = (category == "الكل" || item.category == category)
+      val matchesCategory = when (category) {
+        "الكل" -> true
+        "تمارين وتطبيقات", "تمارين" -> item.contentType == "exercise" || item.category == "تمارين وتطبيقات" || item.title.contains("تمرين")
+        "ورش تطبيقية" -> item.category == "ورش تطبيقية" || item.contentType == "workshop"
+        else -> item.category == category || item.category.contains(category)
+      }
       val matchesQuery = query.isBlank() ||
         item.title.contains(query, ignoreCase = true) ||
         item.description.contains(query, ignoreCase = true) ||

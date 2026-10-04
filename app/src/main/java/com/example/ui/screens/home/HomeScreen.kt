@@ -1032,12 +1032,25 @@ fun HomeScreen(
           colors = CardDefaults.cardColors(containerColor = Color.White),
           modifier = Modifier.fillMaxWidth()
         ) {
-          Text(
-            text = "«لسه بنجهز محتوى جديد ليك 🌱»",
-            style = MaterialTheme.typography.bodyMedium,
-            color = TextDark.copy(alpha = 0.8f),
-            modifier = Modifier.padding(20.dp)
-          )
+          Column(
+            modifier = Modifier.padding(18.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+          ) {
+            Text(
+              text = "استكشف التمارين وورش العمل التفاعلية المكتملة 🌱",
+              style = MaterialTheme.typography.bodyMedium,
+              color = DarkGreen,
+              fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Button(
+              onClick = onNavigateToExplore,
+              colors = ButtonDefaults.buttonColors(containerColor = DarkGreen),
+              shape = RoundedCornerShape(10.dp)
+            ) {
+              Text("فتح جميع التمارين والمقالات ←", color = Color.White, fontSize = 12.sp)
+            }
+          }
         }
       }
     } else {

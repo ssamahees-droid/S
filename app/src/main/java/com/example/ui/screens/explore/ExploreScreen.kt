@@ -71,6 +71,7 @@ fun ExploreScreen(
   val categories = remember {
     listOf(
       "الكل",
+      "تمارين وتطبيقات",
       "ورش تطبيقية",
       "أعرف نفسي",
       "مشاعري",
@@ -260,17 +261,29 @@ fun ExploreScreen(
               )
               Spacer(modifier = Modifier.height(8.dp))
               Text(
-                text = "لسه بنجهز محتوى جديد ليك",
+                text = "لم يتم العثور على محتوى مطابق للبحث",
                 style = MaterialTheme.typography.titleMedium,
                 color = DarkGreen,
                 fontWeight = FontWeight.Bold
               )
               Spacer(modifier = Modifier.height(4.dp))
               Text(
-                text = "جرب البحث بكلمات أخرى أو اختر تصنيفاً مختلفاً",
+                text = "جميع الأقسام والتمارين جاهزة؛ يمكنك النقر أدناه لعرض كل التمارين والمقالات فوراً",
                 style = MaterialTheme.typography.bodyMedium,
-                color = TextDark.copy(alpha = 0.7f)
+                color = TextDark.copy(alpha = 0.7f),
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
               )
+              Spacer(modifier = Modifier.height(14.dp))
+              androidx.compose.material3.Button(
+                onClick = {
+                  onCategorySelect("الكل")
+                  onSearchChange("")
+                },
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = DarkGreen),
+                shape = RoundedCornerShape(12.dp)
+              ) {
+                Text("عرض جميع التمارين والمقالات 🌿", color = Color.White)
+              }
             }
           }
         }
