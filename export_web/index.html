@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نسمة الحياة 🌿 | مساحتك الآمنة للسكينة والوعي النفسي</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Cairo & Tajawal -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <!-- React & ReactDOM CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- Babel Standalone for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            cairo: ['Cairo', 'Tajawal', 'sans-serif'],
+            tajawal: ['Tajawal', 'Cairo', 'sans-serif']
+          },
+          colors: {
+            darkGreen: '#2D5A43',
+            sageGreen: '#5A8A6E',
+            softMint: '#D4EAD9',
+            creamBg: '#F8F6F0',
+            warmBeige: '#EBE5D8',
+            textDark: '#1E2922'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Cairo', 'Tajawal', sans-serif;
+      background-color: #F8F6F0;
+      color: #1E2922;
+      -webkit-font-smoothing: antialiased;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 9999px;
+    }
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); opacity: 0.85; }
+      50% { transform: scale(1.35); opacity: 1; }
+    }
+    .animate-breathe {
+      animation: breathe 8s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="bg-creamBg min-h-screen">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // --- Web Audio Synthesizer for Sound Oasis ---
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.nodes = [];
+        this.isPlaying = false;
+        this.currentSound = null;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+      stop() {
+        this.nodes.forEach(n => {
+          try { n.stop && n.stop(); n.disconnect && n.disconnect(); } catch (e) {}
+        });
+        this.nodes = [];
+        this.isPlaying = false;
+        this.currentSound = null;
+      }
+      playRain() {
+        this.stop();
+        this.init();
+        const bufferSize = this.ctx.sampleRate * 2;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+        noise.loop = true;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 850;
+
+        const gain = this.ctx.createGain();
+        gain.gain.value = 0.25;
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start();
+
+        this.nodes = [noise, filter, gain];
+        this.isPlaying = true;
+        this.currentSound = 'rain';
+      }
+      playBinaural432() {
+        this.stop();
+        this.init();
+        const osc = this.ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(432, this.ctx.currentTime);
+
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+
+        this.nodes = [osc, gain];
+        this.isPlaying = true;
+        this.currentSound = 'binaural';
+      }
+      playWaves() {
+        this.stop();
+        this.init();
+        const bufferSize = this.ctx.sampleRate * 4;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+        noise.loop = true;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 400;
+
+        const gain = this.ctx.createGain();
+        gain.gain.value = 0.2;
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start();
+
+        this.nodes = [noise, filter, gain];
+        this.isPlaying = true;
+        this.currentSound = 'waves';
+      }
+    }
+
+    const soundEngine = new SoundEngine();
+
+    // --- Initial Seed Data ---
+    const INITIAL_ARTICLES = [
+      {
+        id: 1,
+        title: "ورشة ١: صندوق أدواتي النفسية 🧰",
+        description: "مجموعة أدوات عملية للتعامل مع الأيام الصعبة وبناء صندوق أدوات نفسي خاص بك.",
+        category: "ورش تطبيقية",
+        duration: "٢٠ دقيقة تطبيق",
+        body: "هدف الورشة: يتعلم المشارك تحديد ما يضغط عليه بدقة، وبناء قائمة شخصية بالمهدئات الصحية، وعمل خطة واضحة ومكتوبة لأي يوم نفسي صعب."
+      },
+      {
+        id: 2,
+        title: "تمرين تفريغ شحنة الغضب والتوتر بالورقة والقلم ✍️",
+        description: "تمرين إسعافي تطبيقي من ٤ خطوات لتحويل طاقة الانفعال الحبيسة إلى وضوح وراحة ذهنية.",
+        category: "تمارين وتطبيقات",
+        duration: "٧ دقائق تطبيق",
+        body: "1. اكتب كل ما يغضبك بحرية دون تنميق.\n2. ضع دائرة حول ما تملكه واشطب ما هو خارج عن إرادتك.\n3. ابحث عن الشعور الدفين خلف الغضب (خوف؟ إرهاق؟).\n4. مزق الورقة كحركة رمزية لتهدئة الدماغ، ثم تنفس بعمق."
+      },
+      {
+        id: 3,
+        title: "العلاقات المرهقة: كيف تميز بين التعلق والاستنزاف؟ 💔",
+        description: "دليل تحليلي وعملي لفهم العلاقات التي تستهلك طاقتك والتمييز بين العطاء والذوبان المرضي.",
+        category: "العلاقات",
+        duration: "٦ دقائق قراءة",
+        body: "العلاقة الصحية تضيف إلى أمانك وتمنحك مساحة للنمو، بينما العلاقة المستنزفة تجعلك تمشي باستمرار على قشر بيض خشية لوم الطرف الآخر. تعلم وضع حدود محترمة تحمي طاقتك."
+      },
+      {
+        id: 4,
+        title: "التربية الواعية والتعامل مع ضغوط الأبوة والأمومة 👨‍👩‍👧‍👦",
+        description: "دليل الأمهات والآباء لتجنب الاحتراق النفسي الأسري وبناء تواصل دافئ خالٍ من الصراخ.",
+        category: "الأسرة",
+        duration: "٧ دقائق قراءة",
+        body: "لا توجد أم مثالية ولا أب مثالي؛ المطلوب منا هو الأبوة الكافية والجيدة. حين تشعر بالانفجار ابتعد 3 دقائق واغسل وجهك بالماء البارد قبل الاستجابة."
+      },
+      {
+        id: 5,
+        title: "تمرين تقنية الملاحظة الواعية (فك أسر الأفكار) 🧘",
+        description: "تمرين ذهني عملي يساعدك على رؤية أفكارك كسحب عابرة دون الاندماج معها.",
+        category: "تمارين وتطبيقات",
+        duration: "٥ دقائق تدريب",
+        body: "أنت لست أفكارك، أنت الوعي الذي يلاحظ الأفكار. تخيل أفكارك طافية على أوراق شجر في نهر هادئ؛ دعها تمر دون التشبث بها أو مقاومتها."
+      },
+      {
+        id: 6,
+        title: "مسؤوليتك... ولا همّك؟ 🧭",
+        description: "كيف تميز بين ما هو تحت سيطرتك وما هو خارجها لتخفيف وطأة القلق المستمر.",
+        category: "القلق والضغط",
+        duration: "٦ دقائق قراءة",
+        body: "ما تستطيع التحكم فيه: أفعالك، كلماتك، طريقة تجاوبك. ما لا تستطيع التحكم فيه: آراء الناس والماضي. حين تركز على دائرة سيطرتك يعود إليك الأمان الداخلي."
+      }
+    ];
+
+    const DEFAULT_HABITS = [
+      { id: 1, title: "٥ دقائق تنفس هادئ وعميق", icon: "🌬️", completed: true },
+      { id: 2, title: "شرب كوب ماء بوعي وتأمل", icon: "💧", completed: true },
+      { id: 3, title: "تدوين سطر امتنان واحد في مفكرتي", icon: "✨", completed: false },
+      { id: 4, title: "مشي خفيف أو حركة ١٠ دقائق", icon: "🚶", completed: false },
+      { id: 5, title: "لحظة صمت وتصفية الذهن", icon: "🧘", completed: false }
+    ];
+
+    // --- Main Application Component ---
+    function NesmatApp() {
+      const [currentTab, setCurrentTab] = useState('home');
+      const [habits, setHabits] = useState(() => {
+        const saved = localStorage.getItem('nesmat_habits');
+        return saved ? JSON.parse(saved) : DEFAULT_HABITS;
+      });
+      const [notes, setNotes] = useState(() => {
+        const saved = localStorage.getItem('nesmat_notes');
+        return saved ? JSON.parse(saved) : [
+          { id: 1, title: "صباح مشرق", content: "ممتن لنسمة الهواء الصباحية وفنجان الشاي الدافئ مع الأهل.", tag: "امتنان", mood: "🌸", date: "اليوم" }
+        ];
+      });
+      const [articles, setArticles] = useState(() => {
+        const saved = localStorage.getItem('nesmat_articles');
+        return saved ? JSON.parse(saved) : INITIAL_ARTICLES;
+      });
+      const [selectedCategory, setSelectedCategory] = useState('الكل');
+      const [selectedArticle, setSelectedArticle] = useState(null);
+      const [todayMood, setTodayMood] = useState(() => localStorage.getItem('nesmat_today_mood') || 'كويس');
+      const [soundPlaying, setSoundPlaying] = useState(null);
+
+      useEffect(() => {
+        localStorage.setItem('nesmat_habits', JSON.stringify(habits));
+      }, [habits]);
+
+      useEffect(() => {
+        localStorage.setItem('nesmat_notes', JSON.stringify(notes));
+      }, [notes]);
+
+      const toggleHabit = (id) => {
+        setHabits(habits.map(h => h.id === id ? { ...h, completed: !h.completed } : h));
+      };
+
+      const completedHabitsCount = habits.filter(h => h.completed).length;
+      const mindfulMoments = 8 + completedHabitsCount + notes.length;
+
+      return (
+        <div className="max-w-md mx-auto min-h-screen bg-creamBg shadow-xl flex flex-col relative pb-24 border-x border-warmBeige">
+          {/* Top Bar */}
+          <header className="p-4 bg-white/80 backdrop-blur sticky top-0 z-30 border-b border-warmBeige/60 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">🌿</span>
+              <div>
+                <h1 className="font-extrabold text-darkGreen text-lg leading-tight">نسمة الحياة</h1>
+                <p className="text-xs text-sageGreen font-medium">مساحتك الآمنة للسكينة والوعي</p>
+              </div>
+            </div>
+            <div className="bg-softMint/50 px-3 py-1 rounded-full flex items-center gap-1.5 text-darkGreen text-xs font-bold">
+              <span>🌱</span>
+              <span>{mindfulMoments} لحظة سكينة</span>
+            </div>
+          </header>
+
+          {/* Body Content */}
+          <main className="p-4 flex-1">
+            {currentTab === 'home' && (
+              <div className="space-y-4">
+                {/* Greeting Card */}
+                <div className="bg-white p-5 rounded-2xl border border-warmBeige shadow-sm">
+                  <h2 className="text-lg font-bold text-darkGreen mb-1">أهلاً بك يا طيب القلب 🌿</h2>
+                  <p className="text-sm text-textDark/80 mb-4">كيف تجد مشاعرك وطاقتك في هذه اللحظة؟</p>
+                  
+                  {/* Mood Selector */}
+                  <div className="flex justify-between gap-1">
+                    {[
+                      { label: 'كويس', emoji: '😊' },
+                      { label: 'مقبول', emoji: '😐' },
+                      { label: 'مش عارف', emoji: '🫥' },
+                      { label: 'مش كويس', emoji: '😔' },
+                      { label: 'متعب', emoji: '😫' }
+                    ].map(m => (
+                      <button
+                        key={m.label}
+                        onClick={() => { setTodayMood(m.label); localStorage.setItem('nesmat_today_mood', m.label); }}
+                        className={`flex flex-col items-center p-2 rounded-xl transition ${todayMood === m.label ? 'bg-softMint ring-2 ring-darkGreen scale-105' : 'bg-warmBeige/40 hover:bg-warmBeige/70'}`}
+                      >
+                        <span className="text-2xl">{m.emoji}</span>
+                        <span className="text-[11px] font-semibold mt-1 text-darkGreen">{m.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Living Tranquility Tree Card */}
+                <div className="bg-gradient-to-br from-white to-softMint/30 p-5 rounded-2xl border border-softMint shadow-sm text-center">
+                  <div className="w-16 h-16 mx-auto rounded-full bg-softMint flex items-center justify-center text-3xl mb-2 shadow-inner">
+                    🌳
+                  </div>
+                  <h3 className="font-bold text-darkGreen text-base">شجرة الطمأنينة الحية</h3>
+                  <p className="text-xs text-textDark/70 mt-1">تزدهر أوراق شجرتك مع كل لحظة وعي أو عادة تنجزها اليوم.</p>
+                  <div className="w-full bg-warmBeige/50 h-2.5 rounded-full mt-3 overflow-hidden">
+                    <div className="bg-sageGreen h-full rounded-full transition-all duration-500" style={{ width: `${Math.min(100, (mindfulMoments / 20) * 100)}%` }}></div>
+                  </div>
+                </div>
+
+                {/* Daily Habits Tracker Card */}
+                <div className="bg-white p-5 rounded-2xl border border-warmBeige shadow-sm">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">🌱</span>
+                      <div>
+                        <h3 className="font-bold text-darkGreen text-base">عادات التعافي اليومية</h3>
+                        <p className="text-xs text-textDark/60">{completedHabitsCount} من {habits.length} مكتملة اليوم</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 mt-2">
+                    {habits.map(habit => (
+                      <div
+                        key={habit.id}
+                        onClick={() => toggleHabit(habit.id)}
+                        className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition ${habit.completed ? 'bg-softMint/40 text-darkGreen line-through' : 'bg-warmBeige/20 hover:bg-warmBeige/40 text-textDark'}`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={habit.completed}
+                          onChange={() => {}}
+                          className="w-4 h-4 rounded text-darkGreen focus:ring-darkGreen"
+                        />
+                        <span className="text-lg">{habit.icon}</span>
+                        <span className="text-sm font-medium flex-1">{habit.title}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Quick Interactive Features Row */}
+                <div className="grid grid-cols-3 gap-2.5">
+                  <button
+                    onClick={() => setCurrentTab('grounding')}
+                    className="bg-white p-3 rounded-2xl border border-warmBeige flex flex-col items-center text-center hover:shadow transition"
+                  >
+                    <span className="text-2xl mb-1">👁️</span>
+                    <span className="text-xs font-bold text-darkGreen">تأريض 5-4-3-2-1</span>
+                  </button>
+                  <button
+                    onClick={() => setCurrentTab('journal')}
+                    className="bg-white p-3 rounded-2xl border border-warmBeige flex flex-col items-center text-center hover:shadow transition"
+                  >
+                    <span className="text-2xl mb-1">✨</span>
+                    <span className="text-xs font-bold text-darkGreen">مفكرة الامتنان</span>
+                  </button>
+                  <button
+                    onClick={() => setCurrentTab('oasis')}
+                    className="bg-white p-3 rounded-2xl border border-warmBeige flex flex-col items-center text-center hover:shadow transition"
+                  >
+                    <span className="text-2xl mb-1">🌊</span>
+                    <span className="text-xs font-bold text-darkGreen">واحة الأصوات</span>
+                  </button>
+                </div>
+
+                {/* Library Highlights Card */}
+                <div className="bg-white p-5 rounded-2xl border border-warmBeige shadow-sm">
+                  <div className="flex justify-between items-center mb-3">
+                    <h3 className="font-bold text-darkGreen text-base">من مكتبة التمارين والمقالات</h3>
+                    <button onClick={() => setCurrentTab('library')} className="text-xs text-sageGreen font-bold hover:underline">عرض الكل ←</button>
+                  </div>
+                  <div className="space-y-2">
+                    {articles.slice(0, 3).map(art => (
+                      <div
+                        key={art.id}
+                        onClick={() => { setSelectedArticle(art); setCurrentTab('detail'); }}
+                        className="p-3 rounded-xl bg-warmBeige/20 hover:bg-warmBeige/40 cursor-pointer transition flex items-center justify-between"
+                      >
+                        <div>
+                          <h4 className="text-sm font-bold text-darkGreen">{art.title}</h4>
+                          <span className="text-[11px] text-sageGreen font-semibold">{art.category} • {art.duration}</span>
+                        </div>
+                        <span className="text-darkGreen text-sm">←</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Grounding 5-4-3-2-1 Screen */}
+            {currentTab === 'grounding' && <GroundingScreen onBack={() => setCurrentTab('home')} />}
+
+            {/* Gratitude Journal Screen */}
+            {currentTab === 'journal' && (
+              <JournalScreen
+                notes={notes}
+                onAddNote={(note) => setNotes([note, ...notes])}
+                onDeleteNote={(id) => setNotes(notes.filter(n => n.id !== id))}
+                onBack={() => setCurrentTab('home')}
+              />
+            )}
+
+            {/* Sound Oasis Screen */}
+            {currentTab === 'oasis' && (
+              <SoundOasisScreen
+                soundPlaying={soundPlaying}
+                setSoundPlaying={setSoundPlaying}
+                onBack={() => setCurrentTab('home')}
+              />
+            )}
+
+            {/* Library Screen */}
+            {currentTab === 'library' && (
+              <LibraryScreen
+                articles={articles}
+                selectedCategory={selectedCategory}
+                setSelectedCategory={setSelectedCategory}
+                onSelectArticle={(art) => { setSelectedArticle(art); setCurrentTab('detail'); }}
+                onBack={() => setCurrentTab('home')}
+              />
+            )}
+
+            {/* Article Detail View */}
+            {currentTab === 'detail' && selectedArticle && (
+              <div className="bg-white p-6 rounded-2xl border border-warmBeige space-y-4">
+                <button onClick={() => setCurrentTab('library')} className="text-xs font-bold text-sageGreen flex items-center gap-1 mb-2">
+                  ← رجوع إلى المكتبة
+                </button>
+                <div className="inline-block bg-softMint text-darkGreen px-3 py-1 rounded-full text-xs font-bold">
+                  {selectedArticle.category} • {selectedArticle.duration}
+                </div>
+                <h2 className="text-xl font-extrabold text-darkGreen">{selectedArticle.title}</h2>
+                <div className="text-sm text-textDark/90 whitespace-pre-line leading-relaxed bg-creamBg/50 p-4 rounded-xl border border-warmBeige/60">
+                  {selectedArticle.body}
+                </div>
+                <button
+                  onClick={() => setCurrentTab('library')}
+                  className="w-full bg-darkGreen text-white py-2.5 rounded-xl font-bold text-sm shadow hover:bg-opacity-95 transition"
+                >
+                  العودة للمكتبة
+                </button>
+              </div>
+            )}
+          </main>
+
+          {/* Bottom Navigation */}
+          <nav className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 backdrop-blur border-t border-warmBeige py-2 px-6 flex justify-between items-center z-40">
+            <button
+              onClick={() => setCurrentTab('home')}
+              className={`flex flex-col items-center gap-1 text-xs font-bold ${currentTab === 'home' ? 'text-darkGreen scale-105' : 'text-textDark/50'}`}
+            >
+              <span className="text-xl">🏠</span>
+              <span>الرئيسية</span>
+            </button>
+            <button
+              onClick={() => setCurrentTab('grounding')}
+              className={`flex flex-col items-center gap-1 text-xs font-bold ${currentTab === 'grounding' ? 'text-darkGreen scale-105' : 'text-textDark/50'}`}
+            >
+              <span className="text-xl">👁️</span>
+              <span>التأريض</span>
+            </button>
+            <button
+              onClick={() => setCurrentTab('journal')}
+              className={`flex flex-col items-center gap-1 text-xs font-bold ${currentTab === 'journal' ? 'text-darkGreen scale-105' : 'text-textDark/50'}`}
+            >
+              <span className="text-xl">✨</span>
+              <span>الامتنان</span>
+            </button>
+            <button
+              onClick={() => setCurrentTab('oasis')}
+              className={`flex flex-col items-center gap-1 text-xs font-bold ${currentTab === 'oasis' ? 'text-darkGreen scale-105' : 'text-textDark/50'}`}
+            >
+              <span className="text-xl">🌊</span>
+              <span>الواحة</span>
+            </button>
+            <button
+              onClick={() => setCurrentTab('library')}
+              className={`flex flex-col items-center gap-1 text-xs font-bold ${currentTab === 'library' || currentTab === 'detail' ? 'text-darkGreen scale-105' : 'text-textDark/50'}`}
+            >
+              <span className="text-xl">📚</span>
+              <span>المكتبة</span>
+            </button>
+          </nav>
+        </div>
+      );
+    }
+
+    // --- Grounding 5-4-3-2-1 Component ---
+    function GroundingScreen({ onBack }) {
+      const steps = [
+        { count: 5, sense: "حاسة البصر 👁️", prompt: "٥ أشياء تراها الآن بالعين في محيطك", eg: "مثل: كوب ماء، ضوء الشباك، يدك، حائط، هاتفك..." },
+        { count: 4, sense: "حاسة اللمس ✋", prompt: "٤ أشياء تلمس ملمسها وحرارتها الآن", eg: "مثل: ملمس ملابسك، برودة الطاولة، نعومة الغطاء..." },
+        { count: 3, sense: "حاسة السمع 👂", prompt: "٣ أصوات تميزها في المكان", eg: "مثل: صوت أنفاسك، صوت مروحة، صوت سيارة بعيدة..." },
+        { count: 2, sense: "حاسة الشم 👃", prompt: "رائحتين تشمهما في الهواء", eg: "مثل: رائحة قهوة، هواء نقي، عطر ملابسك..." },
+        { count: 1, sense: "التذوق والنفس 👅", prompt: "طعم تتذوقه، أو خذ نفساً عميقاً وقل: أنا هنا في أمان", eg: "رشفة ماء بوعي أو استشعار السكينة التامة." }
+      ];
+      const [stepIdx, setStepIdx] = useState(0);
+      const [completed, setCompleted] = useState(false);
+      const curr = steps[stepIdx];
+
+      return (
+        <div className="bg-white p-6 rounded-2xl border border-warmBeige space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold text-darkGreen">تمرين التأريض الحسي 5-4-3-2-1 👁️</h2>
+            <button onClick={onBack} className="text-xs text-sageGreen font-bold">← رجوع</button>
+          </div>
+
+          {!completed ? (
+            <div className="text-center py-6 space-y-4">
+              <div className="w-20 h-20 mx-auto rounded-full bg-softMint flex items-center justify-center text-4xl font-black text-darkGreen shadow-inner">
+                {curr.count}
+              </div>
+              <span className="text-xs font-bold text-sageGreen bg-softMint/40 px-3 py-1 rounded-full">{curr.sense}</span>
+              <h3 className="text-base font-bold text-darkGreen">{curr.prompt}</h3>
+              <p className="text-xs text-textDark/70 bg-warmBeige/30 p-3 rounded-xl">{curr.eg}</p>
+
+              <button
+                onClick={() => {
+                  if (stepIdx < steps.length - 1) setStepIdx(stepIdx + 1);
+                  else setCompleted(true);
+                }}
+                className="w-full bg-darkGreen text-white py-3 rounded-xl font-bold text-sm shadow hover:bg-opacity-95 transition mt-4"
+              >
+                {stepIdx === steps.length - 1 ? "إنهاء والعودة للسكينة ✨" : "التالي ←"}
+              </button>
+            </div>
+          ) : (
+            <div className="text-center py-8 space-y-3">
+              <div className="text-5xl">🌿</div>
+              <h3 className="text-xl font-bold text-darkGreen">أحسنت! أنت الآن هنا وفي أمان تام</h3>
+              <p className="text-sm text-textDark/80">أعدت عقلك الواعي إلى اللحظة الحاضرة وفصلت دائرة القلق.</p>
+              <button onClick={onBack} className="bg-darkGreen text-white px-6 py-2.5 rounded-xl font-bold text-sm mt-4">
+                العودة للرئيسية
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // --- Gratitude Journal Component ---
+    function JournalScreen({ notes, onAddNote, onDeleteNote, onBack }) {
+      const [title, setTitle] = useState('');
+      const [content, setContent] = useState('');
+      const [tag, setTag] = useState('امتنان');
+      const [mood, setMood] = useState('🌸');
+
+      const handleAdd = () => {
+        if (!content.trim()) return;
+        onAddNote({
+          id: Date.now(),
+          title: title.trim() || `خاطرة ${tag}`,
+          content: content.trim(),
+          tag,
+          mood,
+          date: new Date().toLocaleDateString('ar-EG')
+        });
+        setTitle('');
+        setContent('');
+      };
+
+      return (
+        <div className="space-y-4">
+          <div className="bg-white p-5 rounded-2xl border border-warmBeige shadow-sm space-y-3">
+            <div className="flex justify-between items-center">
+              <h2 className="font-bold text-darkGreen text-base">تدوين امتنان أو خاطرة جديدة ✨</h2>
+              <button onClick={onBack} className="text-xs text-sageGreen font-bold">← رجوع</button>
+            </div>
+
+            <div className="flex gap-2">
+              {['🌸', '☀️', '🌿', '🌊', '☕', '✨'].map(em => (
+                <button
+                  key={em}
+                  onClick={() => setMood(em)}
+                  className={`text-xl p-1 rounded-lg ${mood === em ? 'bg-softMint ring-2 ring-darkGreen' : 'bg-warmBeige/30'}`}
+                >
+                  {em}
+                </button>
+              ))}
+            </div>
+
+            <input
+              type="text"
+              placeholder="عنوان الخاطرة (اختياري)..."
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full text-sm p-2.5 rounded-xl border border-warmBeige focus:outline-none focus:border-darkGreen"
+            />
+            <textarea
+              rows="3"
+              placeholder="ما الذي تشعر بالامتنان لوجوده اليوم؟"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="w-full text-sm p-2.5 rounded-xl border border-warmBeige focus:outline-none focus:border-darkGreen"
+            ></textarea>
+            <button
+              onClick={handleAdd}
+              className="w-full bg-darkGreen text-white py-2.5 rounded-xl font-bold text-sm shadow hover:bg-opacity-95 transition"
+            >
+              حفظ في مفكرتي ✨
+            </button>
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="font-bold text-darkGreen text-sm px-1">سجل الامتنان والمشاعر ({notes.length})</h3>
+            {notes.map(n => (
+              <div key={n.id} className="bg-white p-4 rounded-2xl border border-warmBeige shadow-sm space-y-1">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-1.5 font-bold text-darkGreen text-sm">
+                    <span>{n.mood}</span>
+                    <span>{n.title}</span>
+                  </div>
+                  <button onClick={() => onDeleteNote(n.id)} className="text-xs text-red-500 hover:underline">حذف</button>
+                </div>
+                <p className="text-xs text-textDark/80 leading-relaxed">{n.content}</p>
+                <div className="text-[10px] text-textDark/50 pt-1">{n.date} • {n.tag}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // --- Sound Oasis Component ---
+    function SoundOasisScreen({ soundPlaying, setSoundPlaying, onBack }) {
+      const sounds = [
+        { id: 'rain', name: 'صوت المطر الهادئ', icon: '🌧️', play: () => soundEngine.playRain() },
+        { id: 'waves', name: 'أمواج البحر والسكينة', icon: '🌊', play: () => soundEngine.playWaves() },
+        { id: 'binaural', name: 'تردد 432Hz للسلام النفسي', icon: '🧘', play: () => soundEngine.playBinaural432() }
+      ];
+
+      const handleToggle = (s) => {
+        if (soundPlaying === s.id) {
+          soundEngine.stop();
+          setSoundPlaying(null);
+        } else {
+          s.play();
+          setSoundPlaying(s.id);
+        }
+      };
+
+      return (
+        <div className="bg-white p-6 rounded-2xl border border-warmBeige space-y-5">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-lg font-bold text-darkGreen">واحة الأصوات المحيطية 🌿</h2>
+              <p className="text-xs text-textDark/70">أصوات نقية ومولدة طبيعياً لتصفية الذهن والمساعدة على النوم.</p>
+            </div>
+            <button onClick={onBack} className="text-xs text-sageGreen font-bold">← رجوع</button>
+          </div>
+
+          <div className="space-y-3">
+            {sounds.map(s => (
+              <div
+                key={s.id}
+                onClick={() => handleToggle(s)}
+                className={`p-4 rounded-2xl border cursor-pointer transition flex items-center justify-between ${soundPlaying === s.id ? 'bg-softMint border-darkGreen shadow' : 'bg-warmBeige/20 border-warmBeige hover:bg-warmBeige/40'}`}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl">{s.icon}</span>
+                  <div>
+                    <h4 className="font-bold text-darkGreen text-sm">{s.name}</h4>
+                    <span className="text-xs text-sageGreen">{soundPlaying === s.id ? 'قيد التشغيل الآن...' : 'انقر للتشغيل'}</span>
+                  </div>
+                </div>
+                <span className="text-xl">{soundPlaying === s.id ? '⏸️' : '▶️'}</span>
+              </div>
+            ))}
+          </div>
+
+          {soundPlaying && (
+            <button
+              onClick={() => { soundEngine.stop(); setSoundPlaying(null); }}
+              className="w-full bg-red-100 text-red-700 py-2.5 rounded-xl font-bold text-xs"
+            >
+              إيقاف الصوت الحالي
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    // --- Library Component ---
+    function LibraryScreen({ articles, selectedCategory, setSelectedCategory, onSelectArticle, onBack }) {
+      const categories = ["الكل", "تمارين وتطبيقات", "ورش تطبيقية", "العلاقات", "الأسرة", "القلق والضغط"];
+      const filtered = articles.filter(a => selectedCategory === "الكل" || a.category === selectedCategory);
+
+      return (
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-bold text-darkGreen">مكتبة نسمة حياة 📚</h2>
+            <button onClick={onBack} className="text-xs text-sageGreen font-bold">← رجوع</button>
+          </div>
+
+          {/* Categories Horizontal Scroll */}
+          <div className="flex gap-2 overflow-x-auto custom-scrollbar pb-1">
+            {categories.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition ${selectedCategory === cat ? 'bg-darkGreen text-white shadow' : 'bg-white border border-warmBeige text-textDark'}`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {/* Articles List */}
+          <div className="space-y-2.5">
+            {filtered.map(art => (
+              <div
+                key={art.id}
+                onClick={() => onSelectArticle(art)}
+                className="bg-white p-4 rounded-2xl border border-warmBeige shadow-sm hover:shadow cursor-pointer transition space-y-1"
+              >
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-bold text-sageGreen bg-softMint/40 px-2 py-0.5 rounded-md">{art.category}</span>
+                  <span className="text-[11px] text-textDark/50">{art.duration}</span>
+                </div>
+                <h3 className="font-bold text-darkGreen text-sm pt-1">{art.title}</h3>
+                <p className="text-xs text-textDark/70 line-clamp-2 leading-relaxed">{art.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<NesmatApp />);
+  </script>
+</body>
+</html>
