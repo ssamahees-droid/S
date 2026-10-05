@@ -1,0 +1,19 @@
+{
+  "name": "nesmat-alhayat-web",
+  "version": "1.0.0",
+  "description": "نسمة الحياة 🌿 - مساحتك الآمنة للسكينة والوعي النفسي",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "mental-health",
+    "arabic",
+    "wellness",
+    "react",
+    "tailwind"
+  ],
+  "author": "نسمة الحياة",
+  "license": "MIT"
+}
